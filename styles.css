@@ -239,7 +239,6 @@ img {
     z-index: 3;
     max-width: 800px;
     padding: 0 2rem;
-    padding-top: 7rem;
     width: 100%;
 }
 
@@ -446,7 +445,7 @@ img {
 .split-num {
     font-size: 3rem;
     font-weight: 300;
-    color: var(--border-color);
+    color: var(--text-primary); /* Changed to white color */
     margin-bottom: 1.5rem;
     font-family: monospace;
 }
@@ -989,6 +988,7 @@ footer {
         font-size: clamp(1.1rem, 4vw, 1.4rem);
         letter-spacing: 2px;
         margin-bottom: 0.85rem;
+        color: var(--text-primary); /* Changed to white color on mobile */
     }
     
     .split-heading {

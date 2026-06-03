@@ -79,8 +79,65 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(type, 1000);
     }
 
-    // 3. Scroll Reveal Animation using Intersection Observer
-    // Added '.metric-card' to observe target
+    // 3. Heading Typing Animation
+    function typeHeading(element) {
+        if (element.classList.contains('typed')) return;
+        element.classList.add('typed');
+        
+        const text = element.getAttribute('data-text') || '';
+        let charIndex = 0;
+        element.textContent = '';
+        
+        function typeChar() {
+            if (charIndex < text.length) {
+                element.textContent += text.charAt(charIndex);
+                charIndex++;
+                setTimeout(typeChar, 30);
+            }
+        }
+        typeChar();
+    }
+
+    // Prepare split headings for typing animation
+    const splitHeadings = document.querySelectorAll('.split-heading');
+    splitHeadings.forEach(heading => {
+        const originalText = heading.textContent.trim();
+        heading.setAttribute('data-text', originalText);
+        heading.textContent = '';
+    });
+
+    // 4. Counter Animation for Statistics
+    function animateCounter(element) {
+        const target = parseFloat(element.getAttribute('data-target'));
+        const prefix = element.getAttribute('data-prefix') || '';
+        const suffix = element.getAttribute('data-suffix') || '';
+        const duration = 2000; // 2 seconds
+        const startTime = performance.now();
+        
+        const targetStr = element.getAttribute('data-target');
+        const decimals = targetStr.includes('.') ? targetStr.split('.')[1].length : 0;
+        
+        element.textContent = prefix + (0).toFixed(decimals) + suffix;
+        
+        function update(currentTime) {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            
+            // easeOutCubic
+            const easeProgress = 1 - Math.pow(1 - progress, 3);
+            
+            const currentValue = easeProgress * target;
+            element.textContent = prefix + currentValue.toFixed(decimals) + suffix;
+            
+            if (progress < 1) {
+                requestAnimationFrame(update);
+            }
+        }
+        
+        requestAnimationFrame(update);
+    }
+
+    // 5. Scroll Reveal Animation using Intersection Observer
     const reveals = document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .metric-card');
     
     if (reveals.length > 0) {
@@ -88,6 +145,21 @@ document.addEventListener('DOMContentLoaded', () => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('active');
+                    
+                    // Trigger typing animation for split headings
+                    const headingEl = entry.target.querySelector('.split-heading');
+                    if (headingEl && headingEl.hasAttribute('data-text')) {
+                        typeHeading(headingEl);
+                    }
+                    
+                    // Trigger counter animation on metric numbers
+                    if (entry.target.classList.contains('metric-card')) {
+                        const numEl = entry.target.querySelector('.metric-number');
+                        if (numEl && numEl.hasAttribute('data-target')) {
+                            animateCounter(numEl);
+                        }
+                    }
+                    
                     // Unobserve to keep active state after animation triggers
                     revealObserver.unobserve(entry.target);
                 }
@@ -102,7 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 4. Back and Go to Home Action for 404.html
+    // 6. Back and Go to Home Action for 404.html
     const backBtn = document.getElementById('backBtn');
     if (backBtn) {
         backBtn.addEventListener('click', (e) => {
@@ -115,16 +187,17 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 5. Header Dynamic Styling on Scroll
+    // 7. Header Dynamic Styling on Scroll
     const header = document.querySelector('.navbar');
     if (header) {
+        if (window.scrollY > 50) {
+            header.classList.add('scrolled');
+        }
         window.addEventListener('scroll', () => {
             if (window.scrollY > 50) {
-                header.style.padding = '0.5rem 0';
-                header.style.background = 'rgba(0, 0, 0, 0.95)';
+                header.classList.add('scrolled');
             } else {
-                header.style.padding = '0';
-                header.style.background = 'rgba(0, 0, 0, 0.8)';
+                header.classList.remove('scrolled');
             }
         });
     }
